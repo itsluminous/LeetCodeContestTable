@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "LeetCodeContestTable",
+    "description": "Get a better tabular view of Leetcode contest performance",
+    "homepage_url": "https://github.com/itsluminous/LeetCodeContestTable",
+    "version": "0.0.1",
+    "author": "Prakash",
+    "action": {
+      "default_icon": "assets/logo.png"
+    },
+    "icons": {
+      "16": "assets/logo.png",
+      "48": "assets/logo.png",
+      "128": "assets/logo.png"
+    },
+    "background": {
+      "service_worker": "scripts/background.js"
+    },
+    "permissions": ["scripting", "activeTab"]
+  }
+  
