@@ -54,10 +54,6 @@ async function getUserName() {
   
   // Function to create table
   function createTable(data) {
-    // Remove existing table
-    var oldTable = document.getElementById("leetCodeContestTable");
-    if (oldTable) oldTable.parentNode.removeChild(oldTable);
-  
     var table = document.createElement('table');
     table.id = 'leetCodeContestTable';
     table.classList.add('styled-table'); // Add a class for styling
@@ -136,67 +132,201 @@ async function getUserName() {
   }
 
   // Inject CSS styles into the document head
-  function addCSS(){
+  function addTableCSS(){
     document.head.innerHTML += `
-    <style>
-    .styled-table {
-    border-collapse: collapse;
-    width: 100%;
-    }
+    <style id='leetcodeContestTableStyle'>
+      .styled-table {
+      border-collapse: collapse;
+      width: 100%;
+      }
 
-    .styled-table th, .styled-table td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    position: relative;
-    }
+      .styled-table th, .styled-table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      position: relative;
+      }
 
-    .styled-table th::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 8px;
-    transform: translateY(-50%);
-    font-size: 12px;
-    }
+      .styled-table th::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      font-size: 12px;
+      }
 
-    .styled-table th.asc::after {
-    content: '↑';
-    }
+      .styled-table th.asc::after {
+      content: '↑';
+      }
 
-    .styled-table th.desc::after {
-    content: '↓';
-    }
+      .styled-table th.desc::after {
+      content: '↓';
+      }
 
-    .styled-table th {
-    background-color: #f2f2f2;
-    cursor: pointer;
-    }
+      .styled-table th {
+      background-color: #f2f2f2;
+      cursor: pointer;
+      }
 
-    .styled-table tr.even {
-    background-color: #f9f9f9;
-    }
+      .styled-table tr.even {
+      background-color: #f9f9f9;
+      }
 
-    .styled-table tr.odd {
-    background-color: #ffffff;
-    }
+      .styled-table tr.odd {
+      background-color: #ffffff;
+      }
 
-    .hidden {
-    display: none;
-    }
+      .hidden {
+      display: none;
+      }
     </style>
     `;
   }
 
-  async function execute(){
-    // fetch contest details
-    theusername = await getUserName();
-    contestdata = await getContestInfo(theusername);
-    participatedContestData = contestdata.filter((entry) => entry.attended = true && entry.ranking != 0)
+  function addSpinnerCSS(){
+    document.head.innerHTML += `
+    <style id="initial-loading-style">
+      #initial-loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        transition: opacity .6s;
+        z-index: 1;
+      }
 
-    // Create and append table to the document body
-    addCSS();
-    createTable(participatedContestData);
+      #initial-loading[data-is-hide="true"] {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #initial-loading .spinner {
+        display: flex;
+      }
+
+      #initial-loading .bounce {
+        width: 18px;
+        height: 18px;
+        margin: 0 3px;
+        background-color: #999999;
+        border-radius: 100%;
+        display: inline-block;
+        -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+        animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+      }
+
+      #initial-loading .bounce:nth-child(1) {
+        -webkit-animation-delay: -0.32s;
+        animation-delay: -0.32s;
+      }
+
+      #initial-loading .bounce:nth-child(2) {
+        -webkit-animation-delay: -0.16s;
+        animation-delay: -0.16s;
+      }
+
+      @-webkit-keyframes sk-bouncedelay {
+
+        0%,
+        80%,
+        100% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        }
+
+        40% {
+          -webkit-transform: scale(1.0);
+          transform: scale(1.0);
+        }
+      }
+
+      @keyframes sk-bouncedelay {
+
+        0%,
+        80%,
+        100% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        }
+
+        40% {
+          -webkit-transform: scale(1.0);
+          transform: scale(1.0);
+        }
+      }
+    </style>
+  `;
+  }
+
+  function toggleSpinner(startSpinner){
+    var initialLoadingDiv = document.getElementById('initial-loading');
+    var initialLoadingStyle = document.getElementById('initial-loading-style');
+
+    if (initialLoadingDiv && !startSpinner) {
+        initialLoadingDiv.parentNode.removeChild(initialLoadingDiv);
+        if (initialLoadingStyle) initialLoadingStyle.parentNode.removeChild(initialLoadingStyle);
+    }
+    else if(!initialLoadingDiv && startSpinner){
+      // Create initial loading div
+      var initialLoadingDiv = document.createElement('div');
+      initialLoadingDiv.id = 'initial-loading';
+
+      // Create spinner div
+      var spinnerDiv = document.createElement('div');
+      spinnerDiv.className = 'spinner';
+
+      // Create bounce divs inside spinner div
+      for (var i = 0; i < 3; i++) {
+          var bounceDiv = document.createElement('div');
+          bounceDiv.className = 'bounce';
+          spinnerDiv.appendChild(bounceDiv);
+      }
+
+      // Append spinner div to initial loading div
+      initialLoadingDiv.appendChild(spinnerDiv);
+
+      // Append initial loading div to the document body
+      document.body.appendChild(initialLoadingDiv);
+      addSpinnerCSS();
+    }
+  }
+
+  function removeOldTable(){
+    var oldTable = document.getElementById("leetCodeContestTable");
+    var styleElement = document.getElementById("leetcodeContestTableStyle");
+    if (oldTable){
+      oldTable.parentNode.removeChild(oldTable);
+      if (styleElement) styleElement.parentNode.removeChild(styleElement);
+      return true;
+    }
+    return false;
+  }
+
+  async function execute(){
+    // remove existing table if it exists
+    if(removeOldTable()) return;
+
+    toggleSpinner(true);
+    try {
+      // fetch contest details
+      theusername = await getUserName();
+      contestdata = await getContestInfo(theusername);
+      participatedContestData = contestdata.filter((entry) => entry.attended = true && entry.ranking != 0)
+
+      // Create and append table to the document body
+      addTableCSS();
+      createTable(participatedContestData);
+    } catch (error) {
+      console.error("An error occurred:", error);
+    } finally {
+      toggleSpinner(false);
+    }
   }
 
   execute();
