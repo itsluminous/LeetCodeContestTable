@@ -3,7 +3,7 @@
     "name": "LeetCodeContestTable",
     "description": "Get a better tabular view of Leetcode contest performance",
     "homepage_url": "https://github.com/itsluminous/LeetCodeContestTable",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "author": "Prakash",
     "action": {
       "default_icon": "assets/logo.png"
