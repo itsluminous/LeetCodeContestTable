@@ -18,7 +18,7 @@ async function getUserName() {
   .then(res => res.data.userStatus.username);
 
   return username;
-};
+}
 
 async function getContestInfo(theusername) {
   // Query for getting the contest stats
@@ -41,7 +41,7 @@ async function getContestInfo(theusername) {
   .then(res => res.data.userContestRankingHistory);
 
   return data
-};
+}
 
 // Apply alternating row background colors
 function alternatingRowBackground(table) {
